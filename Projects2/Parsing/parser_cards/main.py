@@ -1,8 +1,8 @@
 # parsing with def
+import csv
+
 import requests
 from bs4 import BeautifulSoup
-from time import sleep
-import csv
 
 CSV = 'cards.csv'
 HOST = 'https://www.vbr.ru/'
@@ -27,18 +27,21 @@ def get_content(html):
         cards.append(
             {
                 'title': item.find('div', class_="product-card-head").get_text(strip=True),
-                'link_product': HOST + item.find('div', class_="product-card-head").find('a').get('href'),
-                'brand': item.find('div', class_="mobile-hide").get_text(strip=True),
+                'link_product': item.find('div', class_="product-card-head").find('a').get('href'),
+                'brand': item.find('div', class_="w100pr").get_text(strip=True),
                 'card_img': HOST + item.find('div', class_="product-card-img").find('img').get('src'),
             }
         )
     return cards
+
+
 def save_doc(items, path):
-    with open (path, 'w', newline='') as file:
+    with open(path, 'w', newline='', encoding='utf-8-sig') as file:
         writer = csv.writer(file, delimiter=';')
         writer.writerow(['Название продукта', 'Ссылка на продукт', 'Банк', 'Изображение карты'])
         for item in items:
             writer.writerow( [item['title'], item['link_product'], item['brand'], item['card_img']])
+
 
 def parser():
     PAGENATION = input('Укажите количество страниц для парсинга: ')
@@ -51,14 +54,9 @@ def parser():
             html = get_html(URL, params={'': page})
             cards.extend(get_content(html.text))
             save_doc(cards, CSV)
-        print(cards)
+        # print(cards)
     else:
         print('Error')
 
 
 parser()
-# html = get_html(URL)
-# print(get_content(html.text))
-2
-# html = get_html(URL)
-# get_content(html.text)

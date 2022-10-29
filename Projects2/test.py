@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from time import sleep
 import csv
 
+CSV = 'cards.csv'
 HOST = 'https://www.vbr.ru/'
 URL = 'https://www.vbr.ru/banki/kreditnyekarty/'
 HEADERS = {
@@ -27,31 +28,8 @@ def get_content(html):
             {
                 'title': item.find('div', class_="product-card-head").get_text(strip=True),
                 'link_product': HOST + item.find('div', class_="product-card-head").find('a').get('href'),
-                'brand': item.find('div', class_="mobile-hide").get_text(strip=True),
+                'brand': item.find('div', class_="w100pr").get_text(strip=True),
                 'card_img': HOST + item.find('div', class_="product-card-img").find('img').get('src'),
             }
         )
     return cards
-
-
-def parser():
-    PAGENATION = input('Укажите количество страниц для парсинга: ')
-    PAGENATION = int(PAGENATION.strip())
-    html = get_html(URL)
-    if html.status_code == 200:
-        cards = []
-        for page in range(1, PAGENATION):
-            print(f'Парсим страницу: {page}')
-            html = get_html(URL, params={'': page})
-            cards.extend(get_content(html.text))
-        print(cards)
-    else:
-        print('Error')
-
-
-parser()
-# html = get_html(URL)
-# print(get_content(html.text))
-
-# html = get_html(URL)
-# get_content(html.text)

@@ -1,4 +1,3 @@
-# https://www.youtube.com/watch?v=ykjBVT57r68&t=2159s
 # parsing with def
 import requests
 from bs4 import BeautifulSoup
@@ -6,11 +5,11 @@ from time import sleep
 import csv
 
 CSV = 'cards.csv'
-HOST = 'https://www.vbr.ru/'
-URL = 'https://www.vbr.ru/banki/kreditnyekarty/'
+HOST = 'https://www.mvideo.ru/'
+URL = 'https://www.mvideo.ru/pylesosy-i-aksessuary-2428/pylesosy-2438'
 HEADERS = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
 }
 
 
@@ -21,16 +20,16 @@ def get_html(url, params=''):
 
 def get_content(html):
     soup = BeautifulSoup(html, "html.parser")
-    items = soup.find_all('div', class_="product-card-cell")
+    items = soup.find_all('div', class_="product-cards-layout__item")
     cards = []
+    print(items)
 
     for item in items:
         cards.append(
             {
-                'title': item.find('div', class_="product-card-head").get_text(strip=True),
-                'link_product': HOST + item.find('div', class_="product-card-head").find('a').get('href'),
-                'cashback': item.find('div', class_="mobile-hide").get_text(strip=True),
-                'card_img': HOST + item.find('div', class_="product-card-img").find('img').get('src'),
+                'title': item.find('div', class_="product-title product-title--mobile").get_text(strip=True),
+                'link_product': HOST + item.find('div', class_="product-title product-title--mobile").find('a').get('href'),
+                'card_img': HOST + item.find('div', class_="mobile-img ng-star-inserted").find('img').get('srcset'),
             }
         )
     return cards
@@ -39,9 +38,9 @@ def get_content(html):
 def save_doc(items, path):
     with open(path, 'w', newline='') as file:
         writer = csv.writer(file, delimiter=';')
-        writer.writerow(['Название продукта', 'Ссылка на продукт', 'Cashback', 'Изображение карты'])
+        writer.writerow(['Название продукта', 'Ссылка на продукт', 'Изображение карты'])
         for item in items:
-            writer.writerow([item['title'], item['link_product'], item['cashback'], item['card_img']])
+            writer.writerow([item['title'], item['link_product'], item['card_img']])
 
 
 def parser():
@@ -55,13 +54,9 @@ def parser():
             html = get_html(URL, params={'': page})
             cards.extend(get_content(html.text))
             save_doc(cards, CSV)
+        print(cards)
     else:
         print('Error')
 
 
 parser()
-# html = get_html(URL)
-# print(get_content(html.text))
-
-# html = get_html(URL)
-# get_content(html.text)
